@@ -1,5 +1,5 @@
 import { string } from 'yup';
-import watcher, { form, field } from './view.js';
+import watcher, { form, inputField } from './view.js';
 
 export default () => {
   const state = {
@@ -8,19 +8,18 @@ export default () => {
   };
 
   const schema = string().url('Ссылка должна быть валидным URL').notOneOf([state.feeds], 'RSS уже существует');
-  const validate = (input) => schema.validate(input, { abortEarly: false });
-
+  const validate = (url) => schema.validate(url, { abortEarly: false });
   const watchedState = watcher(state);
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    validate(field.value)
-      .then((link) => {
-        watchedState.feeds.push(link);
+    validate(inputField.value)
+      .then((url) => {
+        watchedState.feeds.push(url);
         watchedState.error = [];
       })
-      .catch((error) => {
-        watchedState.error = error.inner;
+      .catch((e) => {
+        watchedState.error = e.inner;
       });
   });
 };
