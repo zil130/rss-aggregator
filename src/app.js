@@ -13,16 +13,7 @@ export default () => {
   const feedback = document.querySelector('.feedback');
 
   const schema = string().url('Ссылка должна быть валидным URL').notOneOf([state.feeds], 'RSS уже существует');
-
-  const validate = (input) => {
-    try {
-      schema.validateSync(input, { abortEarly: false });
-      state.feeds.push(input);
-      return [];
-    } catch (e) {
-      return e.inner;
-    }
-  };
+  const validate = (input) => schema.validate(input, { abortEarly: false });
 
   const watchedState = onChange(state, (path, value) => {
     if (path === 'error') {
@@ -40,6 +31,13 @@ export default () => {
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    watchedState.error = validate(field.value);
+    validate(field.value)
+      .then((link) => {
+        state.feeds.push(link);
+        watchedState.error = [];
+      })
+      .catch((error) => {
+        watchedState.error = error.inner;
+      });
   });
 };
