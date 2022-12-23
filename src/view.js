@@ -7,7 +7,7 @@ const feedback = document.querySelector('.feedback');
 
 const renderInvalid = (value) => {
   inputField.classList.add('is-invalid');
-  feedback.textContent = value[0].message;
+  feedback.textContent = value;
 };
 
 const renderValid = () => {
