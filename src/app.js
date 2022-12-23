@@ -1,25 +1,40 @@
-import { string } from 'yup';
+import i18next from 'i18next';
+import { setLocale, string } from 'yup';
+import resources from './locales/index.js';
 import watcher, { form, inputField } from './view.js';
 
 export default () => {
+  const i18n = i18next.createInstance();
+  i18n.init({
+    lng: 'ru',
+    resources,
+  });
+
   const state = {
     feeds: [],
     error: [],
   };
-
-  const schema = string().url('Ссылка должна быть валидным URL').notOneOf([state.feeds], 'RSS уже существует');
-  const validate = (url) => schema.validate(url, { abortEarly: false });
   const watchedState = watcher(state);
+
+  setLocale({
+    mixed: {
+      notOneOf: i18n.t('rssNotUnique'),
+    },
+    string: {
+      url: i18n.t('urlInvalid'),
+    },
+  });
+  const schema = string().url().notOneOf([state.feeds]);
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    validate(inputField.value)
+    schema.validate(inputField.value)
       .then((url) => {
         watchedState.feeds.push(url);
         watchedState.error = [];
       })
       .catch((e) => {
-        watchedState.error = e.inner;
+        watchedState.error = e.errors;
       });
   });
 };
