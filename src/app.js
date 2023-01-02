@@ -4,6 +4,7 @@ import axios from 'axios';
 import resources from './locales/index.js';
 import parser from './parser.js';
 import { form, inputField, watcher } from './view.js';
+import normalizeUrl from './normalizeUrl.js';
 
 export default () => {
   const i18n = i18next.createInstance();
@@ -31,7 +32,7 @@ export default () => {
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    schema.validate(inputField.value)
+    schema.validate(normalizeUrl(inputField.value))
       .then((url) => {
         axios
           .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${url}`)
