@@ -43,45 +43,51 @@ const renderCardTitle = (title, block) => {
   cardBody.append(cardTitle);
 };
 
-const renderNewFeed = (xmlDocument) => {
+const renderNewFeed = (feed) => {
+  const { title, description } = feed;
   const listGroup = feeds.querySelector('.list-group');
   const listGroupItem = document.createElement('li');
   listGroupItem.classList.add('list-group-item', 'border-0', 'border-end-0');
-  const title = document.createElement('h3');
-  title.classList.add('h6', 'm-0');
-  title.textContent = xmlDocument.querySelector('title').textContent;
-  const description = document.createElement('p');
-  description.classList.add('m-0', 'small', 'text-black-50');
-  description.textContent = xmlDocument.querySelector('description').textContent;
+  const feedTitle = document.createElement('h3');
+  feedTitle.classList.add('h6', 'm-0');
+  feedTitle.textContent = title;
+  const feedDescription = document.createElement('p');
+  feedDescription.classList.add('m-0', 'small', 'text-black-50');
+  feedDescription.textContent = description;
 
   listGroup.prepend(listGroupItem);
-  listGroupItem.append(title, description);
+  listGroupItem.append(feedTitle, feedDescription);
 };
 
-const renderPostsOfNewFeed = (xmlDocument) => {
+const renderNewPosts = (newPosts) => {
   const listGroup = posts.querySelector('.list-group');
-  const xmlDocumentItems = xmlDocument.querySelectorAll('item');
+  listGroup.innerHTML = '';
 
-  const listGroupItems = Array.from(xmlDocumentItems).map((xmlDocumentItem) => {
+  const listGroupItems = newPosts.map((post) => {
+    const { id, link, title } = post;
     const listGroupItem = document.createElement('li');
     listGroupItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
-    const link = document.createElement('a');
-    link.classList.add('fw-bold');
-    link.setAttribute('href', xmlDocumentItem.querySelector('link').textContent);
-    link.setAttribute('target', '_blank');
-    link.setAttribute('rel', 'noopener noreferrer');
-    link.textContent = xmlDocumentItem.querySelector('title').textContent;
+    const a = document.createElement('a');
+    a.classList.add('fw-bold');
+    a.setAttribute('href', link);
+    a.setAttribute('target', '_blank');
+    a.setAttribute('rel', 'noopener noreferrer');
+    a.dataset.id = id;
+    a.textContent = title;
     const button = document.createElement('button');
     button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
     button.setAttribute('type', 'button');
+    button.dataset.id = id;
+    button.dataset.bsToggle = 'modal';
+    button.dataset.bsTarget = '#modal';
     button.textContent = i18n.t('view');
 
-    listGroupItem.append(link, button);
+    listGroupItem.append(a, button);
 
     return listGroupItem;
   });
 
-  listGroup.prepend(...listGroupItems);
+  listGroup.append(...listGroupItems);
 };
 
 const watcher = (state) => {
@@ -103,13 +109,15 @@ const watcher = (state) => {
         renderCardTitle('feeds', feeds);
         renderCardTitle('posts', posts);
       }
-    }
 
-    if (path === 'xmlDocument') {
+      const feed = value.at(-1);
       form.reset();
       inputField.focus();
-      renderNewFeed(value);
-      renderPostsOfNewFeed(value);
+      renderNewFeed(feed);
+    }
+
+    if (path === 'posts') {
+      renderNewPosts(value);
     }
   });
 
