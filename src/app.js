@@ -17,7 +17,6 @@ export default () => {
   const state = {
     feeds: [],
     posts: [],
-    xmlDocument: '',
 
     getUrls() {
       return this.feeds.map(({ url }) => url);
@@ -38,6 +37,7 @@ export default () => {
       });
     },
   };
+
   const watchedState = watcher(state);
 
   setLocale({
@@ -49,7 +49,48 @@ export default () => {
       url: i18n.t('textDanger.urlInvalid'),
     },
   });
+
   const getSchema = (existingLinks) => string().url().notOneOf(existingLinks);
+
+  const updatePosts = () => {
+    setTimeout(() => {
+      const promises = state.feeds.map(({ id, url }) => axios
+        .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${url}`)
+        .then((response) => {
+          const xmlString = response.data.contents;
+          const xmlDocument = parser(xmlString);
+
+          if (xmlDocument.querySelector('rss')) {
+            const xmlDocumentItems = xmlDocument.querySelectorAll('item');
+
+            const newPostsOfCurrentFeed = Array.from(xmlDocumentItems)
+              .map((xmlDocumentItem) => {
+                const link = xmlDocumentItem.querySelector('link').textContent.trim();
+                const title = xmlDocumentItem.querySelector('title').textContent.trim();
+
+                return { link, title };
+              })
+              .filter(({ link }) => {
+                const existingPosts = state.posts
+                  .filter(({ post }) => post.feedId === id)
+                  .map(({ post }) => post.link);
+
+                return !existingPosts.includes(link);
+              })
+              .map(({ link, title }) => ({
+                id: _.uniqueId(), link, title, feedId: id,
+              }));
+
+            watchedState.posts = [...newPostsOfCurrentFeed, ...state.posts];
+          }
+        }));
+
+      const promise = Promise.all(promises);
+      promise.then(() => setTimeout(updatePosts, 5000));
+    }, 5000);
+  };
+
+  updatePosts();
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
