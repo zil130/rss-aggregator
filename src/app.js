@@ -30,9 +30,10 @@ export default () => {
         const feedId = this.feeds.at(-1).id;
         const link = xmlDocumentItem.querySelector('link').textContent.trim();
         const title = xmlDocumentItem.querySelector('title').textContent.trim();
+        const description = xmlDocumentItem.querySelector('description').textContent.trim();
 
         return {
-          id, feedId, link, title,
+          id, feedId, link, title, description,
         };
       });
     },
@@ -67,8 +68,9 @@ export default () => {
               .map((xmlDocumentItem) => {
                 const link = xmlDocumentItem.querySelector('link').textContent.trim();
                 const title = xmlDocumentItem.querySelector('title').textContent.trim();
+                const description = xmlDocumentItem.querySelector('description').textContent.trim();
 
-                return { link, title };
+                return { link, title, description };
               })
               .filter(({ link }) => {
                 const existingPosts = state.posts
@@ -77,11 +79,13 @@ export default () => {
 
                 return !existingPosts.includes(link);
               })
-              .map(({ link, title }) => ({
-                id: _.uniqueId(), link, title, feedId: id,
+              .map(({ link, title, description }) => ({
+                id: _.uniqueId(), feedId: id, link, title, description,
               }));
 
-            watchedState.posts = [...newPostsOfCurrentFeed, ...state.posts];
+            if (newPostsOfCurrentFeed.length) {
+              watchedState.posts = [...newPostsOfCurrentFeed, ...state.posts];
+            }
           }
         }));
 
