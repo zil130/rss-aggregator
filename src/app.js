@@ -72,8 +72,8 @@ export default () => {
               })
               .filter(({ link }) => {
                 const existingPosts = state.posts
-                  .filter(({ post }) => post.feedId === id)
-                  .map(({ post }) => post.link);
+                  .filter((post) => post.feedId === id)
+                  .map((post) => post.link);
 
                 return !existingPosts.includes(link);
               })
