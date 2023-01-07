@@ -68,7 +68,7 @@ const renderNewPosts = (visitedLinks, newPosts) => {
     const listGroupItem = document.createElement('li');
     listGroupItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
     const a = document.createElement('a');
-    a.classList.add('fw-normal', visitedLinks.includes(id) ? 'link-secondary' : 'fw-bold');
+    a.className = visitedLinks.includes(id) ? 'fw-normal link-secondary' : 'fw-bold';
     a.setAttribute('href', link);
     a.setAttribute('target', '_blank');
     a.setAttribute('rel', 'noopener noreferrer');
@@ -169,4 +169,6 @@ const watcher = (state) => {
   return watchedState;
 };
 
-export { i18n, form, inputField, watcher };
+export {
+  i18n, form, inputField, watcher,
+};

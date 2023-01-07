@@ -2,7 +2,9 @@ import { setLocale, string } from 'yup';
 import axios from 'axios';
 import _ from 'lodash';
 import parser from './parser.js';
-import { i18n, form, inputField, watcher } from './view.js';
+import {
+  i18n, form, inputField, watcher,
+} from './view.js';
 import normalizeUrl from './normalizeUrl.js';
 
 export default () => {
