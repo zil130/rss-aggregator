@@ -6,8 +6,11 @@ import {
   i18n, form, inputField, watcher,
 } from './view.js';
 import normalizeUrl from './normalizeUrl.js';
+import initialTextsRendering from './initialTextsRendering.js';
 
 export default () => {
+  initialTextsRendering(i18n);
+
   const state = {
     feeds: [],
     posts: [],
