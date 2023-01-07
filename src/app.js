@@ -17,6 +17,9 @@ export default () => {
   const state = {
     feeds: [],
     posts: [],
+    uiState: {
+      visitedLinks: [],
+    },
 
     getUrls() {
       return this.feeds.map(({ url }) => url);

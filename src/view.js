@@ -59,7 +59,7 @@ const renderNewFeed = (feed) => {
   listGroupItem.append(feedTitle, feedDescription);
 };
 
-const renderNewPosts = (newPosts) => {
+const renderNewPosts = (visitedLinks, newPosts) => {
   const listGroup = posts.querySelector('.list-group');
   listGroup.innerHTML = '';
 
@@ -68,7 +68,7 @@ const renderNewPosts = (newPosts) => {
     const listGroupItem = document.createElement('li');
     listGroupItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
     const a = document.createElement('a');
-    a.classList.add('fw-bold');
+    a.classList.add('fw-normal', visitedLinks.includes(id) ? 'link-secondary' : 'fw-bold');
     a.setAttribute('href', link);
     a.setAttribute('target', '_blank');
     a.setAttribute('rel', 'noopener noreferrer');
@@ -88,6 +88,48 @@ const renderNewPosts = (newPosts) => {
   });
 
   listGroup.append(...listGroupItems);
+};
+
+const renderModal = (visitedLinks, statePosts) => {
+  const btns = document.querySelectorAll('[data-bs-target="#modal"]');
+
+  btns.forEach((btn) => {
+    btn.addEventListener('click', (event) => {
+      event.preventDefault();
+      const { id } = btn.dataset;
+      const post = statePosts.find((statePost) => statePost.id === id);
+      const a = document.querySelector(`a[data-id="${id}"]`);
+      a.classList.remove('fw-bold');
+      a.classList.add('fw-normal', 'link-secondary');
+      const modalTitle = document.querySelector('.modal-title');
+      modalTitle.textContent = post.title;
+      const modalBody = document.querySelector('.modal-body');
+      modalBody.textContent = post.description;
+      const readBtn = document.querySelector('.full-article');
+      readBtn.setAttribute('href', post.link);
+
+      if (!visitedLinks.includes(id)) {
+        visitedLinks.push(id);
+      }
+    });
+  });
+};
+
+const changeVisitedLinks = (visitedLinks) => {
+  const postsList = document.querySelector('.posts');
+  const links = postsList.querySelectorAll('a');
+
+  links.forEach((link) => {
+    link.addEventListener('click', () => {
+      const { id } = link.dataset;
+      link.classList.remove('fw-bold');
+      link.classList.add('fw-normal', 'link-secondary');
+
+      if (!visitedLinks.includes(id)) {
+        visitedLinks.push(id);
+      }
+    });
+  });
 };
 
 const watcher = (state) => {
@@ -117,7 +159,10 @@ const watcher = (state) => {
     }
 
     if (path === 'posts') {
-      renderNewPosts(value);
+      const { visitedLinks } = state.uiState;
+      renderNewPosts(visitedLinks, value);
+      renderModal(visitedLinks, value);
+      changeVisitedLinks(visitedLinks);
     }
   });
 
