@@ -169,4 +169,4 @@ const watcher = (state) => {
   return watchedState;
 };
 
-export { form, inputField, watcher };
+export { i18n, form, inputField, watcher };

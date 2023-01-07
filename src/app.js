@@ -1,19 +1,11 @@
-import i18next from 'i18next';
 import { setLocale, string } from 'yup';
 import axios from 'axios';
 import _ from 'lodash';
-import resources from './locales/index.js';
 import parser from './parser.js';
-import { form, inputField, watcher } from './view.js';
+import { i18n, form, inputField, watcher } from './view.js';
 import normalizeUrl from './normalizeUrl.js';
 
 export default () => {
-  const i18n = i18next.createInstance();
-  i18n.init({
-    lng: 'ru',
-    resources,
-  });
-
   const state = {
     feeds: [],
     posts: [],
