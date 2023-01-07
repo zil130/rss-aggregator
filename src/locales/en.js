@@ -1,5 +1,18 @@
 export default {
   translation: {
+    initialRendering: {
+      title: 'RSS aggregator',
+      description: 'Start reading RSS today! It\'s easy, it\'s beautiful',
+      placeholder: 'RSS link',
+      example: 'Example: https://github.blog/feed',
+      btnAdd: 'Add',
+
+      modalRendering: {
+        readMore: 'Read more',
+        close: 'Close',
+      },
+    },
+
     textSuccess: 'RSS uploaded',
 
     textDanger: {
