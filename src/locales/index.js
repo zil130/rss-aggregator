@@ -1,5 +1,5 @@
 import en from './en.js';
-import ru from './ru.js';
 import es from './es.js';
+import ru from './ru.js';
 
-export default { en, ru, es };
+export default { en, es, ru };
