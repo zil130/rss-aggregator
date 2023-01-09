@@ -1,6 +1,7 @@
 import onChange from 'on-change';
 import i18next from 'i18next';
 import resources from './locales/index.js';
+// import renderTexts from './renderTexts.js';
 
 const i18n = i18next.createInstance();
 i18n.init({
@@ -132,10 +133,47 @@ const changeVisitedLinks = (visitedLinks) => {
   });
 };
 
+const renderTexts = (fb) => {
+  document.querySelector('h1.title').textContent = i18n.t('title');
+  document.querySelector('p.description').textContent = i18n.t('description');
+  document.querySelector('label[for="url-input"]').textContent = i18n.t('placeholder');
+  document.querySelector('p.example').textContent = i18n.t('example');
+  document.querySelector('button.btn-add').textContent = i18n.t('btnAdd');
+  document.querySelector('a.full-article').textContent = i18n.t('modal.readMore');
+  document.querySelector('.modal-footer > button.close').textContent = i18n.t('modal.close');
+  document.querySelector('.feedback').textContent = i18n.t(fb);
+  if (document.querySelector('.feeds h2')) {
+    document.querySelector('.feeds h2').textContent = i18n.t('feeds');
+  }
+  if (document.querySelector('.posts h2')) {
+    document.querySelector('.posts h2').textContent = i18n.t('posts');
+  }
+  if (document.querySelectorAll('.posts button')) {
+    document.querySelectorAll('.posts button').forEach((btn) => {
+      btn.textContent = i18n.t('view');
+    });
+  }
+};
+
+const changeLang = (oldLang, newLang) => {
+  const dropdownMenuButton = document.querySelector('#dropdownMenuButton1');
+  dropdownMenuButton.textContent = newLang;
+  const target = document.querySelector(`#${newLang}`);
+  target.classList.add('disabled');
+  target.setAttribute('tabindex', '-1');
+  target.setAttribute('aria-disabled', 'true');
+  const prevTarget = document.querySelector(`#${oldLang}`);
+  prevTarget.classList.remove('disabled');
+  prevTarget.removeAttribute('tabindex');
+  prevTarget.removeAttribute('aria-disabled');
+
+  i18n.changeLanguage(newLang);
+};
+
 const watcher = (state) => {
-  const watchedState = onChange(state, (path, value) => {
+  const watchedState = onChange(state, (path, value, prevValue) => {
     if (path === 'feedback') {
-      feedback.textContent = value;
+      feedback.textContent = i18n.t(value);
     }
 
     if (path === 'rssUploaded') {
@@ -164,11 +202,18 @@ const watcher = (state) => {
       renderModal(visitedLinks, value);
       changeVisitedLinks(visitedLinks);
     }
+
+    if (path === 'lang') {
+      changeLang(prevValue, value);
+      renderTexts(state.feedback);
+    }
   });
 
   return watchedState;
 };
 
+renderTexts();
+
 export {
-  i18n, form, inputField, watcher,
+  form, inputField, watcher,
 };
