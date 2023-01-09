@@ -1,7 +1,6 @@
 import onChange from 'on-change';
 import i18next from 'i18next';
 import resources from './locales/index.js';
-// import renderTexts from './renderTexts.js';
 
 const i18n = i18next.createInstance();
 i18n.init({
