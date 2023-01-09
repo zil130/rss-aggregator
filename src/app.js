@@ -3,17 +3,15 @@ import axios from 'axios';
 import _ from 'lodash';
 import parser from './parser.js';
 import {
-  i18n, form, inputField, watcher,
+  form, inputField, watcher,
 } from './view.js';
 import normalizeUrl from './normalizeUrl.js';
-import initialTextsRendering from './initialTextsRendering.js';
 
 export default () => {
-  initialTextsRendering(i18n);
-
   const state = {
     feeds: [],
     posts: [],
+    lang: 'ru',
     uiState: {
       visitedLinks: [],
     },
@@ -43,11 +41,11 @@ export default () => {
 
   setLocale({
     mixed: {
-      notOneOf: i18n.t('textDanger.rssNotUnique'),
+      notOneOf: 'feedback.textDanger.rssNotUnique',
     },
 
     string: {
-      url: i18n.t('textDanger.urlInvalid'),
+      url: 'feedback.textDanger.urlInvalid',
     },
   });
 
@@ -116,21 +114,31 @@ export default () => {
                 id: _.uniqueId(), url, title, description,
               });
               watchedState.posts = [...watchedState.addPosts(xmlDocument), ...state.posts];
-              watchedState.feedback = [i18n.t('textSuccess')];
+              watchedState.feedback = 'feedback.textSuccess';
             } else {
               watchedState.rssUploaded = false;
-              watchedState.feedback = [i18n.t('textDanger.notContainValidRSS')];
+              watchedState.feedback = 'feedback.textDanger.notContainValidRSS';
             }
           })
           .catch((e) => {
-            const message = (e.message === 'Network Error') ? 'textDanger.networkError' : 'textDanger.unknownError';
-            watchedState.feedback = [i18n.t(message)];
+            const message = (e.message === 'Network Error')
+              ? 'feedback.textDanger.networkError'
+              : 'feedback.textDanger.unknownError';
+            watchedState.feedback = message;
             watchedState.rssUploaded = false;
           });
       })
       .catch((e) => {
         watchedState.rssUploaded = false;
-        watchedState.feedback = [e.errors[0]];
+        watchedState.feedback = e.errors;
       });
+  });
+
+  const languageChoice = document.querySelector('.language-choice');
+  languageChoice.addEventListener('click', (event) => {
+    event.preventDefault();
+    if (event.target.tagName === 'A') {
+      watchedState.lang = event.target.id;
+    }
   });
 };

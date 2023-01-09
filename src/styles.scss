@@ -1,1 +1,6 @@
 @import "~bootstrap/scss/bootstrap";
+
+.line {
+  display: flex;
+  justify-content: space-between;
+}
