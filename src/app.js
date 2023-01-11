@@ -15,26 +15,24 @@ export default () => {
     uiState: {
       visitedLinks: [],
     },
+  };
 
-    getUrls() {
-      return this.feeds.map(({ url }) => url);
-    },
+  const getExistingLinks = (feeds) => feeds.map(({ url }) => url);
 
-    addPosts(xmlDocument) {
-      const xmlDocumentItems = xmlDocument.querySelectorAll('item');
+  const getPostsOfNewFeed = (xmlDocument, feeds) => {
+    const xmlDocumentItems = xmlDocument.querySelectorAll('item');
 
-      return Array.from(xmlDocumentItems).map((xmlDocumentItem) => {
-        const id = _.uniqueId();
-        const feedId = this.feeds.at(-1).id;
-        const link = xmlDocumentItem.querySelector('link').textContent.trim();
-        const title = xmlDocumentItem.querySelector('title').textContent.trim();
-        const description = xmlDocumentItem.querySelector('description').textContent.trim();
+    return Array.from(xmlDocumentItems).map((xmlDocumentItem) => {
+      const id = _.uniqueId();
+      const feedId = feeds.at(-1).id;
+      const link = xmlDocumentItem.querySelector('link').textContent.trim();
+      const title = xmlDocumentItem.querySelector('title').textContent.trim();
+      const description = xmlDocumentItem.querySelector('description').textContent.trim();
 
-        return {
-          id, feedId, link, title, description,
-        };
-      });
-    },
+      return {
+        id, feedId, link, title, description,
+      };
+    });
   };
 
   const watchedState = watcher(state);
@@ -96,7 +94,7 @@ export default () => {
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    const schema = getSchema(watchedState.getUrls());
+    const schema = getSchema(getExistingLinks(watchedState.feeds));
     schema.validate(normalizeUrl(inputField.value))
       .then((url) => {
         watchedState.formLocking = true;
@@ -116,7 +114,10 @@ export default () => {
               watchedState.feeds.push({
                 id: _.uniqueId(), url, title, description,
               });
-              watchedState.posts = [...watchedState.addPosts(xmlDocument), ...state.posts];
+              watchedState.posts = [
+                ...getPostsOfNewFeed(xmlDocument, watchedState.feeds),
+                ...state.posts,
+              ];
               watchedState.feedback = 'feedback.success';
             } else {
               watchedState.formLocking = false;
