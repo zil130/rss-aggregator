@@ -41,11 +41,11 @@ export default () => {
 
   setLocale({
     mixed: {
-      notOneOf: 'feedback.textDanger.rssNotUnique',
+      notOneOf: 'feedback.failure.rssNotUnique',
     },
 
     string: {
-      url: 'feedback.textDanger.urlInvalid',
+      url: 'feedback.failure.urlInvalid',
     },
   });
 
@@ -99,6 +99,8 @@ export default () => {
     const schema = getSchema(watchedState.getUrls());
     schema.validate(normalizeUrl(inputField.value))
       .then((url) => {
+        watchedState.formLocking = true;
+        watchedState.feedback = 'feedback.pending';
         axios
           .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${url}`)
           .then((response) => {
@@ -109,27 +111,29 @@ export default () => {
               const title = xmlDocument.querySelector('title').textContent.trim();
               const description = xmlDocument.querySelector('description').textContent.trim();
 
-              watchedState.rssUploaded = true;
+              watchedState.formLocking = false;
+              watchedState.rssUploaded = [true];
               watchedState.feeds.push({
                 id: _.uniqueId(), url, title, description,
               });
               watchedState.posts = [...watchedState.addPosts(xmlDocument), ...state.posts];
-              watchedState.feedback = 'feedback.textSuccess';
+              watchedState.feedback = 'feedback.success';
             } else {
-              watchedState.rssUploaded = false;
-              watchedState.feedback = 'feedback.textDanger.notContainValidRSS';
+              watchedState.formLocking = false;
+              watchedState.rssUploaded = [false];
+              watchedState.feedback = 'feedback.failure.notContainValidRSS';
             }
           })
           .catch((e) => {
             const message = (e.message === 'Network Error')
-              ? 'feedback.textDanger.networkError'
-              : 'feedback.textDanger.unknownError';
+              ? 'feedback.failure.networkError'
+              : 'feedback.failure.unknownError';
             watchedState.feedback = message;
-            watchedState.rssUploaded = false;
+            watchedState.rssUploaded = [false];
           });
       })
       .catch((e) => {
-        watchedState.rssUploaded = false;
+        watchedState.rssUploaded = [false];
         watchedState.feedback = e.errors;
       });
   });

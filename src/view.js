@@ -9,21 +9,35 @@ i18n.init({
 });
 
 const form = document.querySelector('.rss-form');
-const inputField = document.querySelector('[aria-label="url"]');
+const inputField = form.querySelector('input');
+const btnSubmit = form.querySelector('button');
 inputField.focus();
 const feedback = document.querySelector('.feedback');
 const feeds = document.querySelector('.feeds');
 const posts = document.querySelector('.posts');
 
+const formInteraction = (status) => {
+  if (status) {
+    inputField.disabled = true;
+    btnSubmit.disabled = true;
+    inputField.classList.remove('is-invalid');
+    feedback.classList.remove('text-danger', 'text-success');
+    feedback.classList.add('text-warning');
+  } else {
+    inputField.disabled = false;
+    btnSubmit.disabled = false;
+  }
+};
+
 const renderInvalidFeedback = () => {
   inputField.classList.add('is-invalid');
-  feedback.classList.remove('text-success');
+  feedback.classList.remove('text-success', 'text-warning');
   feedback.classList.add('text-danger');
 };
 
 const renderValidFeedback = () => {
   inputField.classList.remove('is-invalid');
-  feedback.classList.remove('text-danger');
+  feedback.classList.remove('text-danger', 'text-warning');
   feedback.classList.add('text-success');
 };
 
@@ -171,12 +185,16 @@ const changeLang = (oldLang, newLang) => {
 
 const watcher = (state) => {
   const watchedState = onChange(state, (path, value, prevValue) => {
+    if (path === 'formLocking') {
+      formInteraction(value);
+    }
+
     if (path === 'feedback') {
       feedback.textContent = i18n.t(value);
     }
 
     if (path === 'rssUploaded') {
-      if (value) {
+      if (value[0]) {
         renderValidFeedback();
       } else {
         renderInvalidFeedback();

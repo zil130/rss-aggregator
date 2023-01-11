@@ -1,7 +1,7 @@
 export default {
   translation: {
     title: 'RSS aggregator',
-    description: 'Start reading RSS today! It\'s easy, it\'s beautiful',
+    description: 'Start reading RSS today! It\'s easy, it\'s nicely',
     placeholder: 'RSS link',
     example: 'Example: https://github.blog/feed',
     btnAdd: 'Add',
@@ -12,9 +12,10 @@ export default {
     },
 
     feedback: {
-      textSuccess: 'RSS uploaded',
+      success: 'RSS uploaded',
+      pending: 'Loading data',
 
-      textDanger: {
+      failure: {
         urlInvalid: 'The link must be a valid URL',
         rssNotUnique: 'RSS already exists',
         networkError: 'Network error',

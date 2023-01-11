@@ -1,7 +1,7 @@
 export default {
   translation: {
     title: 'Agregador RSS',
-    description: '¡Empieza a leer RSS hoy mismo! Es fácil, es bonito',
+    description: '¡Empieza a leer RSS hoy mismo! Es fácil',
     placeholder: 'Enlace RSS',
     example: 'Ejemplo: https://github.blog/feed',
     btnAdd: 'Añadir',
@@ -12,9 +12,10 @@ export default {
     },
 
     feedback: {
-      textSuccess: 'RSS cargado correctamente',
+      success: 'RSS cargado correctamente',
+      pending: 'Descarga de datos',
 
-      textDanger: {
+      failure: {
         urlInvalid: 'El enlace debe ser una URL válida',
         rssNotUnique: 'RSS ya existe',
         networkError: 'Error de red',

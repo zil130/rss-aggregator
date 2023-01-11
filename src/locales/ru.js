@@ -12,9 +12,10 @@ export default {
     },
 
     feedback: {
-      textSuccess: 'RSS успешно загружен',
+      success: 'RSS успешно загружен',
+      pending: 'Загрузка данных',
 
-      textDanger: {
+      failure: {
         urlInvalid: 'Ссылка должна быть валидным URL',
         rssNotUnique: 'RSS уже существует',
         networkError: 'Ошибка сети',
