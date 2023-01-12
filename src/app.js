@@ -13,7 +13,7 @@ export default () => {
     posts: [],
     lang: 'ru',
     uiState: {
-      visitedLinks: [],
+      visitedLinksIds: new Set(),
     },
   };
 

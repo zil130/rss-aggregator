@@ -73,7 +73,7 @@ const renderNewFeed = (feed) => {
   listGroupItem.append(feedTitle, feedDescription);
 };
 
-const renderNewPosts = (visitedLinks, newPosts) => {
+const renderNewPosts = (visitedLinksIds, newPosts) => {
   const listGroup = posts.querySelector('.list-group');
   listGroup.innerHTML = '';
 
@@ -82,7 +82,7 @@ const renderNewPosts = (visitedLinks, newPosts) => {
     const listGroupItem = document.createElement('li');
     listGroupItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
     const a = document.createElement('a');
-    a.className = visitedLinks.includes(id) ? 'fw-normal link-secondary' : 'fw-bold';
+    a.className = visitedLinksIds.has(id) ? 'fw-normal link-secondary' : 'fw-bold';
     a.setAttribute('href', link);
     a.setAttribute('target', '_blank');
     a.setAttribute('rel', 'noopener noreferrer');
@@ -104,7 +104,7 @@ const renderNewPosts = (visitedLinks, newPosts) => {
   listGroup.append(...listGroupItems);
 };
 
-const renderModal = (visitedLinks, statePosts) => {
+const renderModal = (visitedLinksIds, statePosts) => {
   const btns = document.querySelectorAll('[data-bs-target="#modal"]');
 
   btns.forEach((btn) => {
@@ -121,15 +121,12 @@ const renderModal = (visitedLinks, statePosts) => {
       modalBody.textContent = post.description;
       const readBtn = document.querySelector('.full-article');
       readBtn.setAttribute('href', post.link);
-
-      if (!visitedLinks.includes(id)) {
-        visitedLinks.push(id);
-      }
+      visitedLinksIds.add(id);
     });
   });
 };
 
-const changeVisitedLinks = (visitedLinks) => {
+const changeVisitedLinks = (visitedLinksIds) => {
   const postsList = document.querySelector('.posts');
   const links = postsList.querySelectorAll('a');
 
@@ -138,10 +135,7 @@ const changeVisitedLinks = (visitedLinks) => {
       const { id } = link.dataset;
       link.classList.remove('fw-bold');
       link.classList.add('fw-normal', 'link-secondary');
-
-      if (!visitedLinks.includes(id)) {
-        visitedLinks.push(id);
-      }
+      visitedLinksIds.add(id);
     });
   });
 };
@@ -214,10 +208,10 @@ const watcher = (state) => {
     }
 
     if (path === 'posts') {
-      const { visitedLinks } = state.uiState;
-      renderNewPosts(visitedLinks, value);
-      renderModal(visitedLinks, value);
-      changeVisitedLinks(visitedLinks);
+      const { visitedLinksIds } = state.uiState;
+      renderNewPosts(visitedLinksIds, value);
+      renderModal(visitedLinksIds, value);
+      changeVisitedLinks(visitedLinksIds);
     }
 
     if (path === 'lang') {
