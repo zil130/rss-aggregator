@@ -19,6 +19,14 @@ export default () => {
 
   const getExistingLinks = (feeds) => feeds.map(({ url }) => url);
 
+  const generateQueryString = (url) => {
+    const query = new URL('https://allorigins.hexlet.app/get');
+    query.searchParams.set('disableCache', 'true');
+    query.searchParams.set('url', url);
+
+    return query;
+  };
+
   const watchedState = watcher(state);
 
   setLocale({
@@ -36,7 +44,7 @@ export default () => {
   const updatePosts = () => {
     setTimeout(() => {
       const promises = state.feeds.map(({ id, url }) => axios
-        .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${url}`)
+        .get(generateQueryString(url))
         .then((response) => {
           const xmlString = response.data.contents;
           return parser(xmlString);
@@ -76,7 +84,7 @@ export default () => {
         watchedState.formLocking = true;
         watchedState.feedback = 'feedback.pending';
         axios
-          .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${url}`)
+          .get(generateQueryString(url))
           .then((response) => {
             const xmlString = response.data.contents;
             return parser(xmlString);
