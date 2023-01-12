@@ -19,22 +19,6 @@ export default () => {
 
   const getExistingLinks = (feeds) => feeds.map(({ url }) => url);
 
-  const getPostsOfNewFeed = (xmlDocument, feeds) => {
-    const xmlDocumentItems = xmlDocument.querySelectorAll('item');
-
-    return Array.from(xmlDocumentItems).map((xmlDocumentItem) => {
-      const id = _.uniqueId();
-      const feedId = feeds.at(-1).id;
-      const link = xmlDocumentItem.querySelector('link').textContent.trim();
-      const title = xmlDocumentItem.querySelector('title').textContent.trim();
-      const description = xmlDocumentItem.querySelector('description').textContent.trim();
-
-      return {
-        id, feedId, link, title, description,
-      };
-    });
-  };
-
   const watchedState = watcher(state);
 
   setLocale({
@@ -55,38 +39,30 @@ export default () => {
         .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${url}`)
         .then((response) => {
           const xmlString = response.data.contents;
-          const xmlDocument = parser(xmlString);
+          return parser(xmlString);
+        })
+        .then(({ posts }) => {
+          const newPostsOfCurrentFeed = posts
+            .filter(({ link }) => {
+              const existingPosts = state.posts
+                .filter((post) => post.feedId === id)
+                .map((post) => post.link);
 
-          if (xmlDocument.querySelector('rss')) {
-            const xmlDocumentItems = xmlDocument.querySelectorAll('item');
+              return !existingPosts.includes(link);
+            })
+            .map((post) => ({
+              id: _.uniqueId(), feedId: id, ...post,
+            }));
 
-            const newPostsOfCurrentFeed = Array.from(xmlDocumentItems)
-              .map((xmlDocumentItem) => {
-                const link = xmlDocumentItem.querySelector('link').textContent.trim();
-                const title = xmlDocumentItem.querySelector('title').textContent.trim();
-                const description = xmlDocumentItem.querySelector('description').textContent.trim();
-
-                return { link, title, description };
-              })
-              .filter(({ link }) => {
-                const existingPosts = state.posts
-                  .filter((post) => post.feedId === id)
-                  .map((post) => post.link);
-
-                return !existingPosts.includes(link);
-              })
-              .map(({ link, title, description }) => ({
-                id: _.uniqueId(), feedId: id, link, title, description,
-              }));
-
-            if (newPostsOfCurrentFeed.length) {
-              watchedState.posts = [...newPostsOfCurrentFeed, ...state.posts];
-            }
+          if (newPostsOfCurrentFeed.length) {
+            watchedState.posts = [...newPostsOfCurrentFeed, ...state.posts];
           }
         }));
 
       const promise = Promise.all(promises);
-      promise.then(() => setTimeout(updatePosts, 5000));
+      promise
+        .then(() => setTimeout(updatePosts, 5000))
+        .catch(() => setTimeout(updatePosts, 5000));
     }, 5000);
   };
 
@@ -103,34 +79,35 @@ export default () => {
           .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${url}`)
           .then((response) => {
             const xmlString = response.data.contents;
-            const xmlDocument = parser(xmlString);
-
-            if (xmlDocument.querySelector('rss')) {
-              const title = xmlDocument.querySelector('title').textContent.trim();
-              const description = xmlDocument.querySelector('description').textContent.trim();
-
-              watchedState.formLocking = false;
-              watchedState.rssUploaded = [true];
-              watchedState.feeds.push({
-                id: _.uniqueId(), url, title, description,
-              });
-              watchedState.posts = [
-                ...getPostsOfNewFeed(xmlDocument, watchedState.feeds),
-                ...state.posts,
-              ];
-              watchedState.feedback = 'feedback.success';
-            } else {
-              watchedState.formLocking = false;
-              watchedState.rssUploaded = [false];
-              watchedState.feedback = 'feedback.failure.notContainValidRSS';
-            }
+            return parser(xmlString);
+          })
+          .then(({ feed, posts }) => {
+            watchedState.formLocking = false;
+            watchedState.rssUploaded = [true];
+            watchedState.feedback = 'feedback.success';
+            watchedState.feeds.push({
+              id: _.uniqueId(), url, ...feed,
+            });
+            watchedState.posts = [
+              ...posts.map((post) => ({
+                id: _.uniqueId(), feedId: state.feeds.at(-1).id, ...post,
+              })),
+              ...state.posts,
+            ];
           })
           .catch((e) => {
-            const message = (e.message === 'Network Error')
-              ? 'feedback.failure.networkError'
-              : 'feedback.failure.unknownError';
-            watchedState.feedback = message;
+            switch (e.message) {
+              case 'feedback.failure.notContainValidRSS':
+                watchedState.feedback = e.message;
+                break;
+              case 'Network Error':
+                watchedState.feedback = 'feedback.failure.networkError';
+                break;
+              default:
+                watchedState.feedback = 'feedback.failure.unknownError';
+            }
             watchedState.rssUploaded = [false];
+            watchedState.formLocking = false;
           });
       })
       .catch((e) => {
