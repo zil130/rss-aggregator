@@ -97,40 +97,20 @@ const renderNewPosts = (visitedLinksIds, newPosts, i18n) => {
   listGroup.append(...listGroupItems);
 };
 
-const renderModal = (visitedLinksIds, statePosts) => {
-  const btns = document.querySelectorAll('[data-bs-target="#modal"]');
-
-  btns.forEach((btn) => {
-    btn.addEventListener('click', (event) => {
-      event.preventDefault();
-      const { id } = btn.dataset;
-      const post = statePosts.find((statePost) => statePost.id === id);
-      const a = document.querySelector(`a[data-id="${id}"]`);
-      a.classList.remove('fw-bold');
-      a.classList.add('fw-normal', 'link-secondary');
-      const modalTitle = document.querySelector('.modal-title');
-      modalTitle.textContent = post.title;
-      const modalBody = document.querySelector('.modal-body');
-      modalBody.textContent = post.description;
-      const readBtn = document.querySelector('.full-article');
-      readBtn.setAttribute('href', post.link);
-      visitedLinksIds.add(id);
-    });
-  });
+const renderModal = (id, statePosts) => {
+  const post = statePosts.find((statePost) => statePost.id === id);
+  const modalTitle = document.querySelector('.modal-title');
+  modalTitle.textContent = post.title;
+  const modalBody = document.querySelector('.modal-body');
+  modalBody.textContent = post.description;
+  const readBtn = document.querySelector('.full-article');
+  readBtn.setAttribute('href', post.link);
 };
 
-const changeVisitedLinks = (visitedLinksIds) => {
-  const postsList = document.querySelector('.posts');
-  const links = postsList.querySelectorAll('a');
-
-  links.forEach((link) => {
-    link.addEventListener('click', () => {
-      const { id } = link.dataset;
-      link.classList.remove('fw-bold');
-      link.classList.add('fw-normal', 'link-secondary');
-      visitedLinksIds.add(id);
-    });
-  });
+const highlightVisitedLink = (id) => {
+  const link = document.querySelector(`a[data-id="${id}"]`);
+  link.classList.remove('fw-bold');
+  link.classList.add('fw-normal', 'link-secondary');
 };
 
 const renderTexts = (i18n, fb) => {
@@ -173,5 +153,5 @@ const changeLang = (oldLang, newLang, i18n) => {
 export {
   feedback, feeds, posts, form, inputField, renderFeedback, formInteraction, renderInvalidFeedback,
   renderValidFeedback, renderCardTitle, renderNewFeed, renderNewPosts, renderModal,
-  changeVisitedLinks, renderTexts, changeLang,
+  highlightVisitedLink, renderTexts, changeLang,
 };

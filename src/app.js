@@ -8,7 +8,9 @@ import watcher from './view.js';
 import normalizeUrl from './normalizeUrl.js';
 import getExistingLinks from './getExistingLinks.js';
 import generateQueryString from './generateQueryString.js';
-import { form, inputField, renderTexts } from './renders.js';
+import {
+  form, inputField, posts as postList, renderTexts,
+} from './renders.js';
 
 export default () => {
   const i18n = i18next.createInstance();
@@ -24,6 +26,7 @@ export default () => {
     i18n,
     uiState: {
       visitedLinksIds: new Set(),
+      btnClickIds: [],
     },
   };
 
@@ -42,6 +45,20 @@ export default () => {
   const getSchema = (existingLinks) => string().url().notOneOf(existingLinks);
 
   const watchedState = watcher(state);
+
+  const trackerPostsViews = () => {
+    postList.addEventListener('click', (event) => {
+      const { tagName } = event.target;
+      const { id } = event.target.dataset;
+      if (tagName === 'A' || tagName === 'BUTTON') {
+        watchedState.uiState.visitedLinksIds.add(id);
+      }
+
+      if (tagName === 'BUTTON') {
+        watchedState.uiState.btnClickIds.push(id);
+      }
+    });
+  };
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -69,6 +86,7 @@ export default () => {
               })),
               ...state.posts,
             ];
+            trackerPostsViews();
           })
           .catch((e) => {
             switch (e.message) {
@@ -89,14 +107,6 @@ export default () => {
         watchedState.rssUploaded = [false];
         watchedState.feedback = e.errors;
       });
-  });
-
-  const languageChoice = document.querySelector('.language-choice');
-  languageChoice.addEventListener('click', (event) => {
-    event.preventDefault();
-    if (event.target.tagName === 'A') {
-      watchedState.lang = event.target.id;
-    }
   });
 
   const updatePosts = () => {
@@ -122,6 +132,7 @@ export default () => {
 
           if (newPostsOfCurrentFeed.length) {
             watchedState.posts = [...newPostsOfCurrentFeed, ...state.posts];
+            trackerPostsViews();
           }
         }));
 
@@ -133,4 +144,12 @@ export default () => {
   };
 
   updatePosts();
+
+  const languageChoice = document.querySelector('.language-choice');
+  languageChoice.addEventListener('click', (event) => {
+    event.preventDefault();
+    if (event.target.tagName === 'A') {
+      watchedState.lang = event.target.id;
+    }
+  });
 };
