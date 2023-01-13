@@ -1,33 +1,32 @@
 import { setLocale, string } from 'yup';
 import axios from 'axios';
 import _ from 'lodash';
+import i18next from 'i18next';
+import resources from './locales/index.js';
 import parser from './parser.js';
-import {
-  form, inputField, watcher,
-} from './view.js';
+import watcher from './view.js';
 import normalizeUrl from './normalizeUrl.js';
+import getExistingLinks from './getExistingLinks.js';
+import { form, inputField, renderTexts } from './renders.js';
 
 export default () => {
+  const i18n = i18next.createInstance();
+  i18n.init({
+    lng: 'ru',
+    resources,
+  });
+
   const state = {
     feeds: [],
     posts: [],
     lang: 'ru',
+    i18n,
     uiState: {
       visitedLinksIds: new Set(),
     },
   };
 
-  const getExistingLinks = (feeds) => feeds.map(({ url }) => url);
-
-  const generateQueryString = (url) => {
-    const query = new URL('https://allorigins.hexlet.app/get');
-    query.searchParams.set('disableCache', 'true');
-    query.searchParams.set('url', url);
-
-    return query;
-  };
-
-  const watchedState = watcher(state);
+  renderTexts(i18n);
 
   setLocale({
     mixed: {
@@ -41,40 +40,7 @@ export default () => {
 
   const getSchema = (existingLinks) => string().url().notOneOf(existingLinks);
 
-  const updatePosts = () => {
-    setTimeout(() => {
-      const promises = state.feeds.map(({ id, url }) => axios
-        .get(generateQueryString(url))
-        .then((response) => {
-          const xmlString = response.data.contents;
-          return parser(xmlString);
-        })
-        .then(({ posts }) => {
-          const newPostsOfCurrentFeed = posts
-            .filter(({ link }) => {
-              const existingPosts = state.posts
-                .filter((post) => post.feedId === id)
-                .map((post) => post.link);
-
-              return !existingPosts.includes(link);
-            })
-            .map((post) => ({
-              id: _.uniqueId(), feedId: id, ...post,
-            }));
-
-          if (newPostsOfCurrentFeed.length) {
-            watchedState.posts = [...newPostsOfCurrentFeed, ...state.posts];
-          }
-        }));
-
-      const promise = Promise.all(promises);
-      promise
-        .then(() => setTimeout(updatePosts, 5000))
-        .catch(() => setTimeout(updatePosts, 5000));
-    }, 5000);
-  };
-
-  updatePosts();
+  const watchedState = watcher(state);
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -131,4 +97,39 @@ export default () => {
       watchedState.lang = event.target.id;
     }
   });
+
+  const updatePosts = () => {
+    setTimeout(() => {
+      const promises = state.feeds.map(({ id, url }) => axios
+        .get(generateQueryString(url))
+        .then((response) => {
+          const xmlString = response.data.contents;
+          return parser(xmlString);
+        })
+        .then(({ posts }) => {
+          const newPostsOfCurrentFeed = posts
+            .filter(({ link }) => {
+              const existingPosts = state.posts
+                .filter((post) => post.feedId === id)
+                .map((post) => post.link);
+
+              return !existingPosts.includes(link);
+            })
+            .map((post) => ({
+              id: _.uniqueId(), feedId: id, ...post,
+            }));
+
+          if (newPostsOfCurrentFeed.length) {
+            watchedState.posts = [...newPostsOfCurrentFeed, ...state.posts];
+          }
+        }));
+
+      const promise = Promise.all(promises);
+      promise
+        .then(() => setTimeout(updatePosts, 5000))
+        .catch(() => setTimeout(updatePosts, 5000));
+    }, 5000);
+  };
+
+  updatePosts();
 };
