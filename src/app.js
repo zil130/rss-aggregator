@@ -7,6 +7,7 @@ import parser from './parser.js';
 import watcher from './view.js';
 import normalizeUrl from './normalizeUrl.js';
 import getExistingLinks from './getExistingLinks.js';
+import generateQueryString from './generateQueryString.js';
 import { form, inputField, renderTexts } from './renders.js';
 
 export default () => {
