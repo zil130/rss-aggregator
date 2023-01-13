@@ -2,7 +2,7 @@ import onChange from 'on-change';
 import {
   feedback, feeds, posts, formInteraction, renderFeedback, renderInvalidFeedback,
   renderValidFeedback, renderCardTitle, renderNewFeed, renderNewPosts, renderModal,
-  changeVisitedLinks, renderTexts, changeLang,
+  highlightVisitedLink, renderTexts, changeLang,
 } from './renders.js';
 
 export default (state) => {
@@ -36,8 +36,14 @@ export default (state) => {
     if (path === 'posts') {
       const { visitedLinksIds } = state.uiState;
       renderNewPosts(visitedLinksIds, value, state.i18n);
-      renderModal(visitedLinksIds, value);
-      changeVisitedLinks(visitedLinksIds);
+    }
+
+    if (path === 'uiState.visitedLinksIds') {
+      highlightVisitedLink([...value].at(-1));
+    }
+
+    if (path === 'uiState.btnClickIds') {
+      renderModal(value.at(-1), state.posts);
     }
 
     if (path === 'lang') {
