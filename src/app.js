@@ -26,7 +26,9 @@ export default () => {
     i18n,
     uiState: {
       visitedLinksIds: new Set(),
-      btnClickIds: [],
+      modal: {
+        postId: null,
+      },
     },
   };
 
@@ -46,7 +48,7 @@ export default () => {
 
   const watchedState = watcher(state);
 
-  const trackerPostsViews = () => {
+  const trackPostViews = () => {
     postList.addEventListener('click', (event) => {
       const { tagName } = event.target;
       const { id } = event.target.dataset;
@@ -55,7 +57,7 @@ export default () => {
       }
 
       if (tagName === 'BUTTON') {
-        watchedState.uiState.btnClickIds.push(id);
+        watchedState.uiState.modal.postId = id;
       }
     });
   };
@@ -86,7 +88,7 @@ export default () => {
               })),
               ...state.posts,
             ];
-            trackerPostsViews();
+            trackPostViews();
           })
           .catch((e) => {
             switch (e.message) {
@@ -132,7 +134,6 @@ export default () => {
 
           if (newPostsOfCurrentFeed.length) {
             watchedState.posts = [...newPostsOfCurrentFeed, ...state.posts];
-            trackerPostsViews();
           }
         }));
 

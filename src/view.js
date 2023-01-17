@@ -42,8 +42,8 @@ export default (state) => {
       highlightVisitedLink([...value].at(-1));
     }
 
-    if (path === 'uiState.btnClickIds') {
-      renderModal(value.at(-1), state.posts);
+    if (path === 'uiState.modal.postId') {
+      renderModal(value, state.posts);
     }
 
     if (path === 'lang') {
