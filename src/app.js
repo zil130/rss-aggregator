@@ -92,9 +92,7 @@ export default () => {
           .get(generateQueryString(url))
           .then((response) => {
             const xmlString = response.data.contents;
-            return parser(xmlString);
-          })
-          .then(({ feed, posts }) => {
+            const { feed, posts } = parser(xmlString);
             watchedState.formLocking = false;
             watchedState.highlightFeedback = 'success';
             watchedState.feedback = 'feedback.success';
@@ -136,9 +134,7 @@ export default () => {
         .get(generateQueryString(url))
         .then((response) => {
           const xmlString = response.data.contents;
-          return parser(xmlString);
-        })
-        .then(({ posts }) => {
+          const { posts } = parser(xmlString);
           const newPostsOfCurrentFeed = posts
             .filter(({ link }) => {
               const existingPosts = state.posts
