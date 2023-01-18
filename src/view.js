@@ -153,14 +153,14 @@ const changeLang = (oldLang, newLang, i18n) => {
   i18n.changeLanguage(newLang);
 };
 
-export default (state) => {
+export default (state, i18n) => {
   const watchedState = onChange(state, (path, value, prevValue) => {
     if (path === 'formLocking') {
       formInteraction(value);
     }
 
     if (path === 'feedback') {
-      feedback.textContent = showFeedback(state.i18n, value);
+      feedback.textContent = showFeedback(i18n, value);
     }
 
     if (path === 'highlightFeedback') {
@@ -169,8 +169,8 @@ export default (state) => {
 
     if (path === 'feeds') {
       if (value.length === 1) {
-        renderCardTitle('feeds', feeds, state.i18n);
-        renderCardTitle('posts', posts, state.i18n);
+        renderCardTitle('feeds', feeds, i18n);
+        renderCardTitle('posts', posts, i18n);
       }
 
       const feed = value.at(-1);
@@ -179,7 +179,7 @@ export default (state) => {
 
     if (path === 'posts') {
       const { visitedLinksIds } = state.uiState;
-      renderNewPosts(visitedLinksIds, value, state.i18n);
+      renderNewPosts(visitedLinksIds, value, i18n);
     }
 
     if (path === 'uiState.visitedLinksIds') {
@@ -191,8 +191,8 @@ export default (state) => {
     }
 
     if (path === 'lang') {
-      changeLang(prevValue, value, state.i18n);
-      renderTexts(state.i18n, state.feedback);
+      changeLang(prevValue, value, i18n);
+      renderTexts(i18n, state.feedback);
     }
   });
 
