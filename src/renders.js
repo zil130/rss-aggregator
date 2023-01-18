@@ -11,25 +11,26 @@ const formInteraction = (status) => {
   if (status) {
     inputField.disabled = true;
     btnSubmit.disabled = true;
-    inputField.classList.remove('is-invalid');
-    feedback.classList.remove('text-danger', 'text-success');
-    feedback.classList.add('text-warning');
   } else {
     inputField.disabled = false;
     btnSubmit.disabled = false;
   }
 };
 
-const renderInvalidFeedback = () => {
-  inputField.classList.add('is-invalid');
-  feedback.classList.remove('text-success', 'text-warning');
-  feedback.classList.add('text-danger');
-};
+const highlightFeedback = (color) => {
+  if (color === 'danger') {
+    inputField.classList.add('is-invalid');
+  } else {
+    inputField.classList.remove('is-invalid');
+  }
 
-const renderValidFeedback = () => {
-  inputField.classList.remove('is-invalid');
-  feedback.classList.remove('text-danger', 'text-warning');
-  feedback.classList.add('text-success');
+  feedback.classList.forEach((name) => {
+    if (name.substring(0, 5) === 'text-') {
+      feedback.classList.remove(name);
+    }
+  });
+
+  feedback.classList.add(`text-${color}`);
 };
 
 const renderCardTitle = (title, block, i18n) => {
@@ -151,7 +152,7 @@ const changeLang = (oldLang, newLang, i18n) => {
 };
 
 export {
-  feedback, feeds, posts, form, inputField, renderFeedback, formInteraction, renderInvalidFeedback,
-  renderValidFeedback, renderCardTitle, renderNewFeed, renderNewPosts, renderModal,
+  feedback, feeds, posts, form, inputField, renderFeedback, formInteraction,
+  highlightFeedback, renderCardTitle, renderNewFeed, renderNewPosts, renderModal,
   highlightVisitedLink, renderTexts, changeLang,
 };
