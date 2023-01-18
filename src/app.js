@@ -66,20 +66,6 @@ export default () => {
 
   const watchedState = watcher(state);
 
-  const trackPostViews = () => {
-    postList.addEventListener('click', (event) => {
-      const { tagName } = event.target;
-      const { id } = event.target.dataset;
-      if (tagName === 'A' || tagName === 'BUTTON') {
-        watchedState.uiState.visitedLinksIds.add(id);
-      }
-
-      if (tagName === 'BUTTON') {
-        watchedState.uiState.modal.postId = id;
-      }
-    });
-  };
-
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     const schema = getSchema(getExistingLinks(watchedState.feeds));
@@ -105,7 +91,6 @@ export default () => {
               })),
               ...state.posts,
             ];
-            trackPostViews();
           })
           .catch((e) => {
             switch (e.message) {
@@ -126,6 +111,18 @@ export default () => {
         watchedState.highlightFeedback = 'danger';
         watchedState.feedback = e.errors;
       });
+  });
+
+  postList.addEventListener('click', (event) => {
+    const { tagName } = event.target;
+    const { id } = event.target.dataset;
+    if (tagName === 'A' || tagName === 'BUTTON') {
+      watchedState.uiState.visitedLinksIds.add(id);
+    }
+
+    if (tagName === 'BUTTON') {
+      watchedState.uiState.modal.postId = id;
+    }
   });
 
   const updatePosts = () => {
