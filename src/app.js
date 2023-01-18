@@ -24,6 +24,7 @@ export default () => {
     feeds: [],
     posts: [],
     formLocking: false,
+    feedback: null,
     highlightFeedback: null,
     i18n,
     uiState: {
