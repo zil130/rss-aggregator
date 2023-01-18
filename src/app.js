@@ -150,9 +150,7 @@ export default () => {
         }));
 
       const promise = Promise.all(promises);
-      promise
-        .then(() => setTimeout(updatePosts, 5000))
-        .catch(() => setTimeout(updatePosts, 5000));
+      promise.finally(() => setTimeout(updatePosts, 5000))
     }, 5000);
   };
 
