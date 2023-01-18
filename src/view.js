@@ -1,7 +1,7 @@
 import onChange from 'on-change';
 import {
-  feedback, feeds, posts, formInteraction, renderFeedback, renderInvalidFeedback,
-  renderValidFeedback, renderCardTitle, renderNewFeed, renderNewPosts, renderModal,
+  highlightFeedback, feedback, feeds, posts, formInteraction, renderFeedback,
+  renderCardTitle, renderNewFeed, renderNewPosts, renderModal,
   highlightVisitedLink, renderTexts, changeLang,
 } from './renders.js';
 
@@ -15,12 +15,8 @@ export default (state) => {
       feedback.textContent = renderFeedback(state.i18n, value);
     }
 
-    if (path === 'rssUploaded') {
-      if (value[0]) {
-        renderValidFeedback();
-      } else {
-        renderInvalidFeedback();
-      }
+    if (path === 'highlightFeedback') {
+      highlightFeedback(value);
     }
 
     if (path === 'feeds') {

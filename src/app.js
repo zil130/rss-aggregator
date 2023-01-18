@@ -20,9 +20,11 @@ export default () => {
   });
 
   const state = {
+    lang: 'ru',
     feeds: [],
     posts: [],
-    lang: 'ru',
+    formLocking: false,
+    highlightFeedback: null,
     i18n,
     uiState: {
       visitedLinksIds: new Set(),
@@ -68,6 +70,7 @@ export default () => {
     schema.validate(normalizeUrl(inputField.value))
       .then((url) => {
         watchedState.formLocking = true;
+        watchedState.highlightFeedback = 'warning';
         watchedState.feedback = 'feedback.pending';
         axios
           .get(generateQueryString(url))
@@ -77,7 +80,7 @@ export default () => {
           })
           .then(({ feed, posts }) => {
             watchedState.formLocking = false;
-            watchedState.rssUploaded = [true];
+            watchedState.highlightFeedback = 'success';
             watchedState.feedback = 'feedback.success';
             watchedState.feeds.push({
               id: _.uniqueId(), url, ...feed,
@@ -101,12 +104,12 @@ export default () => {
               default:
                 watchedState.feedback = 'feedback.failure.unknownError';
             }
-            watchedState.rssUploaded = [false];
+            watchedState.highlightFeedback = 'danger';
             watchedState.formLocking = false;
           });
       })
       .catch((e) => {
-        watchedState.rssUploaded = [false];
+        watchedState.highlightFeedback = 'danger';
         watchedState.feedback = e.errors;
       });
   });
