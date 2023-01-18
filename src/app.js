@@ -4,13 +4,28 @@ import _ from 'lodash';
 import i18next from 'i18next';
 import resources from './locales/index.js';
 import parser from './parser.js';
-import watcher from './view.js';
-import normalizeUrl from './normalizeUrl.js';
-import getExistingLinks from './getExistingLinks.js';
-import generateQueryString from './generateQueryString.js';
-import {
+import watcher, {
   form, inputField, posts as postList, renderTexts,
-} from './renders.js';
+} from './view.js';
+
+const getExistingLinks = (feeds) => feeds.map(({ url }) => url);
+
+const normalizeUrl = (url) => {
+  const res = url.trim().split('');
+  while (res.slice(-1).toString() === '/') {
+    res.splice(-1);
+  }
+
+  return res.join('');
+};
+
+const generateQueryString = (url) => {
+  const query = new URL('https://allorigins.hexlet.app/get');
+  query.searchParams.set('disableCache', 'true');
+  query.searchParams.set('url', url);
+
+  return query;
+};
 
 export default () => {
   const i18n = i18next.createInstance();
