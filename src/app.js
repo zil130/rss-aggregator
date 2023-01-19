@@ -82,12 +82,13 @@ export default () => {
                 watchedState.formLocking = false;
                 watchedState.highlightFeedback = 'success';
                 watchedState.feedback = 'feedback.success';
+                const feedId = _.uniqueId();
                 watchedState.feeds.push({
-                  id: _.uniqueId(), url, ...feed,
+                  id: feedId, url, ...feed,
                 });
                 watchedState.posts = [
                   ...posts.map((post) => ({
-                    id: _.uniqueId(), feedId: state.feeds.at(-1).id, ...post,
+                    id: _.uniqueId(), feedId, ...post,
                   })),
                   ...state.posts,
                 ];
