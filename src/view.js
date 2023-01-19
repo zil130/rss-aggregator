@@ -7,8 +7,6 @@ const feedback = document.querySelector('.feedback');
 const feeds = document.querySelector('.feeds');
 const posts = document.querySelector('.posts');
 
-const showFeedback = (i18n, text) => i18n.t(text);
-
 const formInteraction = (status) => {
   if (status) {
     inputField.disabled = true;
@@ -160,7 +158,7 @@ export default (state, i18n) => {
     }
 
     if (path === 'feedback') {
-      feedback.textContent = showFeedback(i18n, value);
+      feedback.textContent = i18n.t(value);
     }
 
     if (path === 'highlightFeedback') {
