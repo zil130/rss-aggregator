@@ -36,7 +36,7 @@ export default () => {
     })
     .then(() => {
       const state = {
-        lang: 'ru',
+        lang: i18n.language,
         feeds: [],
         posts: [],
         formLocking: false,
