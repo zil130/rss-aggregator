@@ -123,12 +123,15 @@ const renderTexts = (i18n, fb) => {
   document.querySelector('a.full-article').textContent = i18n.t('modal.readMore');
   document.querySelector('.modal-footer > button.close').textContent = i18n.t('modal.close');
   document.querySelector('.feedback').textContent = i18n.t(fb);
+
   if (document.querySelector('.feeds h2')) {
     document.querySelector('.feeds h2').textContent = i18n.t('feeds');
   }
+
   if (document.querySelector('.posts h2')) {
     document.querySelector('.posts h2').textContent = i18n.t('posts');
   }
+
   if (document.querySelectorAll('.posts button')) {
     document.querySelectorAll('.posts button').forEach((btn) => {
       btn.textContent = i18n.t('view');
