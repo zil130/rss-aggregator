@@ -12,6 +12,7 @@ const getExistingLinks = (feeds) => feeds.map(({ url }) => url);
 
 const normalizeUrl = (url) => {
   const res = url.trim().split('');
+
   while (res.slice(-1).toString() === '/') {
     res.splice(-1);
   }
@@ -35,6 +36,8 @@ export default () => {
       resources,
     })
     .then(() => {
+      renderTexts(i18n);
+
       const state = {
         lang: i18n.language,
         feeds: [],
@@ -49,8 +52,6 @@ export default () => {
           },
         },
       };
-
-      renderTexts(i18n);
 
       setLocale({
         mixed: {
@@ -69,60 +70,76 @@ export default () => {
       form.addEventListener('submit', (event) => {
         event.preventDefault();
         const schema = getSchema(getExistingLinks(watchedState.feeds));
-        schema.validate(normalizeUrl(inputField.value))
-          .then((url) => {
+        const url = normalizeUrl(inputField.value);
+
+        schema.validate(url)
+          .then(() => {
             watchedState.formLocking = true;
             watchedState.highlightFeedback = 'warning';
             watchedState.feedback = 'feedback.pending';
-            axios
-              .get(generateQueryString(url))
-              .then((response) => {
-                const xmlString = response.data.contents;
-                const { feed, posts } = parser(xmlString);
-                watchedState.formLocking = false;
-                watchedState.highlightFeedback = 'success';
-                watchedState.feedback = 'feedback.success';
-                const feedId = _.uniqueId();
-                watchedState.feeds.push({
-                  id: feedId, url, ...feed,
-                });
-                watchedState.posts = [
-                  ...posts.map((post) => ({
-                    id: _.uniqueId(), feedId, ...post,
-                  })),
-                  ...state.posts,
-                ];
-              })
-              .catch((e) => {
-                switch (e.message) {
-                  case 'feedback.failure.notContainValidRSS':
-                    watchedState.feedback = e.message;
-                    break;
-                  case 'Network Error':
-                    watchedState.feedback = 'feedback.failure.networkError';
-                    break;
-                  default:
-                    watchedState.feedback = 'feedback.failure.unknownError';
-                }
-                watchedState.highlightFeedback = 'danger';
-                watchedState.formLocking = false;
-              });
+
+            return axios.get(generateQueryString(url));
+          })
+          .then((response) => {
+            const xmlString = response.data.contents;
+            const { feed, posts } = parser(xmlString);
+            const feedId = _.uniqueId();
+
+            watchedState.formLocking = false;
+            watchedState.highlightFeedback = 'success';
+            watchedState.feedback = 'feedback.success';
+            watchedState.feeds.push({
+              id: feedId, url, ...feed,
+            });
+            watchedState.posts = [
+              ...posts.map((post) => ({
+                id: _.uniqueId(), feedId, ...post,
+              })),
+              ...state.posts,
+            ];
           })
           .catch((e) => {
+            switch (e.message) {
+              case 'feedback.failure.urlInvalid':
+                watchedState.feedback = e.message;
+                break;
+              case 'feedback.failure.rssNotUnique':
+                watchedState.feedback = e.message;
+                break;
+              case 'feedback.failure.notContainValidRSS':
+                watchedState.feedback = e.message;
+                break;
+              case 'Network Error':
+                watchedState.feedback = 'feedback.failure.networkError';
+                break;
+              default:
+                watchedState.feedback = 'feedback.failure.unknownError';
+            }
+
             watchedState.highlightFeedback = 'danger';
-            watchedState.feedback = e.errors;
+            watchedState.formLocking = false;
           });
       });
 
       postList.addEventListener('click', (event) => {
         const { tagName } = event.target;
         const { id } = event.target.dataset;
+
         if (tagName === 'A' || tagName === 'BUTTON') {
           watchedState.uiState.visitedLinksIds.add(id);
         }
 
         if (tagName === 'BUTTON') {
           watchedState.uiState.modal.postId = id;
+        }
+      });
+
+      const languageChoice = document.querySelector('.language-choice');
+      languageChoice.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        if (event.target.tagName === 'A') {
+          watchedState.lang = event.target.id;
         }
       });
 
@@ -156,13 +173,5 @@ export default () => {
       };
 
       updatePosts();
-
-      const languageChoice = document.querySelector('.language-choice');
-      languageChoice.addEventListener('click', (event) => {
-        event.preventDefault();
-        if (event.target.tagName === 'A') {
-          watchedState.lang = event.target.id;
-        }
-      });
     });
 };
