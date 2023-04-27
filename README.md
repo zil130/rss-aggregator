@@ -1,6 +1,9 @@
-[![Actions Status](https://github.com/zil130/frontend-project-11/workflows/hexlet-check/badge.svg)](https://github.com/zil130/frontend-project-11/actions)
-[![Maintainability](https://api.codeclimate.com/v1/badges/a6c6eb3137f02eb7519d/maintainability)](https://codeclimate.com/github/zil130/frontend-project-11/maintainability)
+# RSS aggregator
 
-[Rss aggregator](https://rss-aggregator-zil130.vercel.app/) is a service for aggregating RSS feeds that makes it easy to read a variety of sources, such as blogs. It allows you to add an unlimited number of RSS feeds, updates them and adds new entries to the total stream.
+[![Actions Status](https://github.com/zil130/frontend-project-11/workflows/hexlet-check/badge.svg)](https://github.com/zil130/frontend-project-11/actions)
+
+RSS is a special format representing web news feeds, article annotations, and other content. This is the easiest way for websites (usually blogs) to enable users to subscribe to updates. For this purpose, special services called RSS aggregators are used. These services can check RSS web feeds for updates and conveniently display them, marking what they have read, and so on.
+
+[Rss aggregator](https://rss-aggregator-zil130.vercel.app/) is a RSS feeds aggregator that helps you conveniently read a variety of sources, for example, blogs. You can add an infinite number of RSS feeds, check for updates, and add new entries to the main stream with this tool.
 
 https://rss-aggregator-zil130.vercel.app/
